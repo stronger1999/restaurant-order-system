@@ -1,0 +1,146 @@
+{% extends 'frontend/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<h1 style="margin-bottom:30px;">Checkout</h1>
+
+<div style="display:grid; grid-template-columns:1.3fr .7fr; gap:30px; align-items:start;">
+
+  <!-- CHECKOUT FORM -->
+  <form class="form" method="post">
+    {% csrf_token %}
+
+    <h2 style="margin-bottom:20px;">Order Details</h2>
+
+    <label>Table</label>
+    <select name="table">
+      <option value="">No table</option>
+      {% for table in tables %}
+        <option value="{{ table.id }}">
+          Table {{ table.number }} - {{ table.seats }} seats
+        </option>
+      {% endfor %}
+    </select>
+
+    <label>Payment method</label>
+
+    <div style="background:#fff7f2; border:1px solid #ffd5c2; border-radius:18px; padding:20px; margin-bottom:20px;">
+      <img src="{% static 'images/blik.png' %}" alt="BLIK" style="height:60px; margin-bottom:10px;">
+      <p style="color:#666;">
+        Pay quickly using simulated BLIK online payment or choose offline admin approval.
+      </p>
+    </div>
+
+    <select name="payment_method" id="payment_method">
+      <option value="ONLINE">BLIK Online Payment</option>
+      <option value="OFFLINE">Offline admin approval</option>
+    </select>
+
+    <div id="blik_box" style="margin-top:20px;">
+      <label>BLIK code</label>
+
+      <input
+        type="text"
+        name="blik_code"
+        maxlength="6"
+        pattern="[0-9]{6}"
+        placeholder="123456"
+        style="font-size:30px; letter-spacing:10px; text-align:center;"
+      >
+
+      <small style="color:#666;">
+        Test success: 111111 / 222222 / 333333 —
+        Test fail: 999999 / 888888 / 777777
+      </small>
+    </div>
+
+    <label style="margin-top:25px; display:block;">Notes</label>
+    <textarea name="notes" rows="4" placeholder="Any special request?"></textarea>
+
+    <button type="button" class="btn" onclick="startPaymentProcess()" style="width:100%; margin-top:10px;">
+      Place Order
+    </button>
+  </form>
+
+  <!-- PAYMENT INFO CARD -->
+  <div class="card">
+    <div class="card-body">
+      <h2 style="margin-bottom:15px;">Secure Payment</h2>
+
+      <img src="{% static 'images/blik.png' %}" alt="BLIK" style="width:100%; max-width:220px; margin:15px 0;">
+
+      <p style="color:#666; line-height:1.7;">
+        Your order will be submitted after payment confirmation.
+        Offline payments wait for admin approval.
+      </p>
+
+      <hr style="margin:20px 0;">
+
+      <p><b>Online:</b> instant result</p>
+      <p><b>Offline:</b> admin approval</p>
+      <p><b>Status:</b> pending / approved / failed</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- Payment Overlay -->
+<div id="payment_overlay"
+     style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.82); z-index:9999; color:white; text-align:center; padding-top:150px;">
+
+  <div style="background:white; color:#222; max-width:480px; margin:auto; padding:40px; border-radius:28px; box-shadow:0 20px 60px rgba(0,0,0,.35);">
+
+    <img src="{% static 'images/blik.png' %}" style="height:80px; margin-bottom:20px;">
+
+    <h2>Processing BLIK payment...</h2>
+
+    <h1 id="countdown" style="font-size:90px; color:#ff6b35; margin:20px 0;">
+      10
+    </h1>
+
+    <p style="color:#666;">
+      Please confirm payment in your mobile banking app.
+    </p>
+
+  </div>
+</div>
+
+<script>
+const paymentMethod = document.getElementById("payment_method");
+const blikBox = document.getElementById("blik_box");
+
+function toggleBlikBox() {
+  blikBox.style.display = paymentMethod.value === "ONLINE" ? "block" : "none";
+}
+
+paymentMethod.addEventListener("change", toggleBlikBox);
+toggleBlikBox();
+
+function startPaymentProcess() {
+  const method = paymentMethod.value;
+
+  if (method === "OFFLINE") {
+    document.querySelector("form").submit();
+    return;
+  }
+
+  document.getElementById("payment_overlay").style.display = "block";
+
+  let count = 10;
+  const countdown = document.getElementById("countdown");
+  countdown.innerText = count;
+
+  const interval = setInterval(() => {
+    count--;
+    countdown.innerText = count;
+
+    if (count <= 0) {
+      clearInterval(interval);
+      document.querySelector("form").submit();
+    }
+  }, 1000);
+}
+</script>
+
+{% endblock %}

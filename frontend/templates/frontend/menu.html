@@ -1,0 +1,107 @@
+{% extends 'frontend/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<h1 style="margin-bottom:25px;">Our Menu</h1>
+
+<form method="get"
+      action="/menu/"
+      style="background:white;
+             padding:22px;
+             border-radius:22px;
+             box-shadow:0 8px 24px rgba(0,0,0,.08);
+             margin-bottom:30px;
+             display:grid;
+             grid-template-columns:2fr 1fr auto;
+             gap:15px;
+             align-items:center;">
+
+  <input type="text"
+         name="q"
+         value="{{ query }}"
+         placeholder="Search food..."
+         style="margin:0;">
+
+  <select name="category" style="margin:0;">
+    <option value="">All Categories</option>
+
+    {% for category in categories %}
+      <option value="{{ category }}"
+              {% if selected_category == category %}selected{% endif %}>
+        {{ category }}
+      </option>
+    {% endfor %}
+  </select>
+
+  <button class="btn" type="submit">
+    Search
+  </button>
+
+</form>
+
+<div style="margin-bottom:25px;">
+  <a href="/menu/"
+     class="btn"
+     style="background:#151515;">
+    Reset
+  </a>
+</div>
+
+<div class="grid">
+{% for item in items %}
+
+  <div class="card">
+
+    {% if item.image %}
+      <img src="{{ item.image.url }}"
+           class="food-image"
+           alt="{{ item.name }}">
+    {% else %}
+      <img src="{% static 'images/default-food.jpg' %}"
+           class="food-image"
+           alt="Food image">
+    {% endif %}
+
+    <div class="card-body">
+      <h3 style="font-size:24px;">
+        {{ item.name }}
+      </h3>
+
+      <p style="color:#ff6b35; font-weight:bold; margin:8px 0;">
+        {{ item.category.name }}
+      </p>
+
+      <p style="color:#666; min-height:45px; line-height:1.5;">
+        {{ item.description }}
+      </p>
+
+      <p class="price">
+        {{ item.price }} PLN
+      </p>
+
+      <form method="post" action="/cart/add/{{ item.id }}/">
+        {% csrf_token %}
+        <button class="btn" style="width:100%;">
+          Add to cart
+        </button>
+      </form>
+    </div>
+
+  </div>
+
+{% empty %}
+
+  <div class="card">
+    <div class="card-body">
+      <h3>No results found</h3>
+      <p style="color:#666; margin-top:10px;">
+        Try another search or category.
+      </p>
+    </div>
+  </div>
+
+{% endfor %}
+</div>
+
+{% endblock %}

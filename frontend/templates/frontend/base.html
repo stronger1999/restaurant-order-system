@@ -1,0 +1,358 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Restaurant Order Management</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f6f3ee;
+      color: #222;
+    }
+
+    .nav {
+      background: #151515;
+      color: white;
+      padding: 18px 50px;
+      display: flex;
+      gap: 22px;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0,0,0,.15);
+    }
+
+    .nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      transition: .3s;
+    }
+
+    .nav a:hover {
+      color: #ff6b35;
+    }
+
+    .brand {
+      font-size: 26px;
+      font-weight: 800;
+      color: #ff6b35 !important;
+      margin-right: 10px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .hero {
+      background:
+        linear-gradient(rgba(0,0,0,.65), rgba(0,0,0,.65)),
+        url("/static/images/restaurant-banner.jpg");
+
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+
+      min-height: 420px;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-end;
+      text-align: right;
+
+      color: white;
+      border-radius: 28px;
+      padding: 80px 50px;
+      overflow: hidden;
+      box-shadow: 0 12px 35px rgba(0,0,0,.18);
+      margin-bottom: 50px;
+    }
+
+    .hero h1 {
+      font-size: 54px;
+      max-width: 500px;
+      margin-bottom: 18px;
+    }
+
+    .hero p {
+      font-size: 20px;
+      max-width: 520px;
+      margin-bottom: 25px;
+      color: #f1f1f1;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 26px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,.08);
+      transition: .35s;
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 14px 35px rgba(0,0,0,.14);
+    }
+
+    .card-body {
+      padding: 22px;
+    }
+
+    .food-image {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .price {
+      font-size: 22px;
+      font-weight: 800;
+      color: #ff6b35;
+      margin: 14px 0;
+    }
+
+    .btn {
+      display: inline-block;
+      background: #ff6b35;
+      color: white;
+      padding: 14px 28px;
+      border-radius: 14px;
+      text-decoration: none;
+      border: 0;
+      cursor: pointer;
+      font-weight: 700;
+      transition: .3s;
+      box-shadow: 0 6px 18px rgba(255,107,53,.35);
+    }
+
+    .btn:hover {
+      background: #e85a27;
+      transform: translateY(-2px);
+    }
+
+    .danger {
+      background: #dc3545;
+    }
+
+    .messages {
+      list-style: none;
+      margin-bottom: 20px;
+    }
+
+    .messages li {
+      background: #fff3cd;
+      padding: 14px 18px;
+      border-radius: 12px;
+      margin-bottom: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0,0,0,.08);
+    }
+
+    td, th {
+      padding: 16px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      margin: 8px 0 18px;
+      font-size: 15px;
+    }
+
+    .form {
+      background: white;
+      padding: 30px;
+      border-radius: 22px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.08);
+      max-width: 650px;
+    }
+
+    @media(max-width: 768px) {
+      .nav {
+        padding: 15px 20px;
+        flex-wrap: wrap;
+      }
+
+      .hero {
+        padding: 70px 28px;
+        align-items: flex-start;
+        text-align: left;
+      }
+
+      .hero h1 {
+        font-size: 36px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<nav class="nav">
+
+  <!-- LEFT SIDE -->
+
+  <div style="
+      display:flex;
+      align-items:center;
+      gap:18px;
+      flex:1;
+  ">
+
+    <!-- LOGO -->
+
+    <a class="brand"
+       href="/"
+       style="
+          display:flex;
+          align-items:center;
+          text-decoration:none;
+       ">
+
+      <img
+        src="{% static 'images/restaurant-logo.png' %}"
+        alt="Numidia Logo"
+        style="
+            height:48px;
+            width:48px;
+            object-fit:cover;
+            border-radius:50%;
+            margin-right:12px;
+            border:2px solid #ff6b35;
+        "
+      >
+
+      <span style="
+          font-size:28px;
+          font-weight:800;
+          color:#ff6b35;
+      ">
+        Numidia
+      </span>
+
+    </a>
+
+    <!-- LIVE CLOCK -->
+
+    <div id="live-clock"
+         style="
+            background:linear-gradient(135deg,#ff6b35,#ff914d);
+            color:white;
+            padding:14px 24px;
+            border-radius:18px;
+            font-size:24px;
+            font-weight:800;
+            min-width:170px;
+            text-align:center;
+            box-shadow:0 8px 24px rgba(255,107,53,.35);
+            letter-spacing:2px;
+         ">
+
+      00:00:00
+
+    </div>
+
+  </div>
+
+  <!-- NAV LINKS -->
+
+  <a href="/menu/">Menu</a>
+
+  <a href="/cart/">Cart</a>
+
+  <a href="/orders/">My Orders</a>
+
+  {% if user.is_staff or user.is_superuser %}
+    <a href="/api/docs/">API Docs</a>
+    <a href="/secure-admin-2026/">Admin</a>
+  {% endif %}
+
+  {% if user.is_authenticated %}
+
+    <span style="
+        color:#ff6b35;
+        font-weight:bold;
+    ">
+      Hi {{ user.username }}
+    </span>
+
+    <a href="/logout/">Logout</a>
+
+  {% else %}
+
+    <a href="/login/">Login</a>
+
+    <a href="/register/">Register</a>
+
+  {% endif %}
+
+</nav>
+
+<div class="container">
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% block content %}{% endblock %}
+</div>
+<script>
+
+function updateClock() {
+
+    const now = new Date();
+
+    const hours =
+        String(now.getHours()).padStart(2, '0');
+
+    const minutes =
+        String(now.getMinutes()).padStart(2, '0');
+
+    const seconds =
+        String(now.getSeconds()).padStart(2, '0');
+
+    document.getElementById('live-clock').innerHTML =
+        `${hours}:${minutes}:${seconds}`;
+}
+
+setInterval(updateClock, 1000);
+
+updateClock();
+
+</script>
+</body>
+</html>

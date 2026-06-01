@@ -1,0 +1,327 @@
+{% extends 'frontend/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<h1 style="
+    margin-bottom:35px;
+    font-size:38px;
+">
+    Your Cart
+</h1>
+
+{% if lines %}
+
+<div style="
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:35px;
+    align-items:start;
+">
+
+    <!-- CART ITEMS -->
+
+    <div>
+
+        {% for line in lines %}
+
+        <div class="card"
+             style="
+                margin-bottom:25px;
+                border-radius:24px;
+                overflow:hidden;
+             ">
+
+            <div style="
+                display:flex;
+                gap:25px;
+                align-items:center;
+                padding:20px;
+            ">
+
+                <!-- IMAGE -->
+
+                {% if line.item.image %}
+
+                    <img src="{{ line.item.image.url }}"
+                         alt="{{ line.item.name }}"
+                         class="food-image"
+                         style="
+                            width:190px;
+                            height:150px;
+                            object-fit:cover;
+                            border-radius:18px;
+                         ">
+
+                {% else %}
+
+                    <img src="{% static 'images/default-food.jpg' %}"
+                         alt="Food image"
+                         class="food-image"
+                         style="
+                            width:190px;
+                            height:150px;
+                            object-fit:cover;
+                            border-radius:18px;
+                         ">
+
+                {% endif %}
+
+                <!-- INFO -->
+
+                <div style="flex:1;">
+
+                    <h2 style="
+                        margin-bottom:10px;
+                        font-size:28px;
+                    ">
+                        {{ line.item.name }}
+                    </h2>
+
+                    <p style="
+                        color:#666;
+                        margin-bottom:15px;
+                        line-height:1.6;
+                    ">
+                        {{ line.item.description }}
+                    </p>
+
+                    <!-- QUANTITY CONTROLS -->
+
+                    <div style="
+                        display:flex;
+                        align-items:center;
+                        gap:12px;
+                        margin-bottom:18px;
+                    ">
+
+                        <!-- DECREASE -->
+
+                        <form method="post"
+                              action="/cart/decrease/{{ line.item.id }}/">
+
+                            {% csrf_token %}
+
+                            <button class="btn"
+                                    style="
+                                        width:42px;
+                                        height:42px;
+                                        padding:0;
+                                        font-size:22px;
+                                    ">
+
+                                -
+
+                            </button>
+
+                        </form>
+
+                        <!-- QUANTITY -->
+
+                        <div style="
+                            min-width:50px;
+                            text-align:center;
+                            font-size:22px;
+                            font-weight:bold;
+                        ">
+
+                            {{ line.quantity }}
+
+                        </div>
+
+                        <!-- INCREASE -->
+
+                        <form method="post"
+                              action="/cart/increase/{{ line.item.id }}/">
+
+                            {% csrf_token %}
+
+                            <button class="btn"
+                                    style="
+                                        width:42px;
+                                        height:42px;
+                                        padding:0;
+                                        font-size:22px;
+                                    ">
+
+                                +
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                    <!-- PRICE -->
+
+                    <p style="
+                        color:#ff6b35;
+                        font-size:28px;
+                        font-weight:bold;
+                        margin-bottom:18px;
+                    ">
+                        {{ line.line_total }} PLN
+                    </p>
+
+                    <!-- REMOVE -->
+
+                    <form method="post"
+                          action="/cart/remove/{{ line.item.id }}/">
+
+                        {% csrf_token %}
+
+                        <button class="btn danger"
+                                style="
+                                    border:none;
+                                    padding:12px 22px;
+                                    border-radius:12px;
+                                ">
+
+                            Remove Item
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    <!-- ORDER SUMMARY -->
+
+    <div class="card"
+         style="
+            border-radius:24px;
+            position:sticky;
+            top:100px;
+         ">
+
+        <div class="card-body"
+             style="padding:30px;">
+
+            <h2 style="
+                margin-bottom:30px;
+                font-size:30px;
+            ">
+                Order Summary
+            </h2>
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                margin-bottom:18px;
+                font-size:18px;
+            ">
+
+                <span>Items</span>
+
+                <b>{{ lines|length }}</b>
+
+            </div>
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                margin-bottom:18px;
+                font-size:18px;
+            ">
+
+                <span>Delivery</span>
+
+                <b>Free</b>
+
+            </div>
+
+            <hr style="margin:25px 0;">
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                margin-bottom:30px;
+                font-size:28px;
+                font-weight:bold;
+            ">
+
+                <span>Total</span>
+
+                <span style="color:#ff6b35;">
+                    {{ total }} PLN
+                </span>
+
+            </div>
+
+            <a class="btn"
+               href="/checkout/"
+               style="
+                    width:100%;
+                    text-align:center;
+                    display:block;
+                    padding:16px;
+                    border-radius:14px;
+                    font-size:18px;
+                    font-weight:bold;
+               ">
+
+                Proceed to Checkout
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% else %}
+
+<div class="card"
+     style="
+        text-align:center;
+        padding:70px;
+        border-radius:24px;
+     ">
+
+    <img src="{% static 'images/empty-cart.png' %}"
+         alt="Empty cart"
+         style="
+            width:200px;
+            margin-bottom:25px;
+         ">
+
+    <h2 style="
+        margin-bottom:15px;
+        font-size:34px;
+    ">
+        Your cart is empty
+    </h2>
+
+    <p style="
+        margin-bottom:25px;
+        color:#666;
+        font-size:18px;
+    ">
+        Add delicious food from the menu.
+    </p>
+
+    <a class="btn"
+       href="/menu/"
+       style="
+            padding:14px 28px;
+            border-radius:12px;
+       ">
+
+        Browse Menu
+
+    </a>
+
+</div>
+
+{% endif %}
+
+{% endblock %}

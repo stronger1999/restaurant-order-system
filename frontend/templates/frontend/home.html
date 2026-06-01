@@ -1,0 +1,64 @@
+{% extends 'frontend/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="hero">
+  <h1>Delicious Food Delivered Fast</h1>
+
+  <p>
+    Fresh meals, easy ordering,
+    and secure online or offline payment.
+  </p>
+</div>
+
+<div style="margin-top:25px;
+            margin-bottom:40px;
+            text-align:center;">
+
+  <a class="btn"
+     href="/menu/"
+     style="display:inline-block;
+            width:auto;
+            padding:14px 32px;">
+
+      Order Now
+
+  </a>
+
+</div>
+
+<h2 style="margin-bottom:25px;">Featured Items</h2>
+
+<div class="grid">
+  {% for item in featured_items %}
+    <div class="card">
+
+      {% if item.image %}
+        <img src="{{ item.image.url }}" class="food-image" alt="{{ item.name }}">
+      {% else %}
+        <img src="{% static 'images/default-food.jpg' %}" class="food-image" alt="Food image">
+      {% endif %}
+
+      <div class="card-body">
+        <h3>{{ item.name }}</h3>
+        <p style="color:#666; margin:10px 0;">{{ item.description }}</p>
+        <p class="price">{{ item.price }} PLN</p>
+
+        <form method="post" action="/cart/add/{{ item.id }}/">
+          {% csrf_token %}
+          <button class="btn">Add to cart</button>
+        </form>
+      </div>
+
+    </div>
+  {% empty %}
+    <div class="card">
+      <div class="card-body">
+        <p>No menu items yet. Add items from the admin panel.</p>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+{% endblock %}
